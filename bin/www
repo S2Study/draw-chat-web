@@ -20,8 +20,8 @@ app.set('port', port);
  */
 var server = http.createServer(app);
 
-server.listen(3000, function(){
-  console.log('listening on *:3000');
+server.listen(5000, function(){
+  console.log('listening on *:5000');
 });
 
 //サーバーを立ち上げたら実行
