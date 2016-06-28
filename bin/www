@@ -38,11 +38,78 @@ server.on('listening', onListening);
 var io = require('socket.io')(server);
 
 //socket処理を記載する
+var roomList = new Object();
+var defaultRoom = "みんなの広場";
+roomList[defaultRoom] = 0;
+
 io.on('connection', function(socket){
 
-  socket.on('chat message', function(msg){
-    console.log('message: ' + msg);
-    io.emit('chat message', msg);
+
+  socket.on('init', function(room){
+    socket.join(defaultRoom);
+    io.sockets.emit("room in", {name: defaultRoom});
+
+    var member = roomList[defaultRoom];
+    roomList[defaultRoom] = member+1;
+    console.log("#########");
+    console.log(socket.rooms);
+    console.log(roomList);
+    console.log(roomList[defaultRoom]);
+    console.log("#########");
+    io.sockets.emit("port", {value: roomList[defaultRoom]});
+  });
+
+  socket.on('join room', function(room){
+    console.log('join room: ' + room);
+    socket.join(room);
+  });
+
+  socket.on("enter", function(data2){
+    var data2name = htmlspecialchars(data2.value);
+    //ルーム作成orルーム入室イベントが起きる。XSSを回避
+    if(!roomList[data2name]){
+      //ルームが作られていない場合
+
+      roomList[data2name] = 1;
+      console.log(data2name + "番ルームが作られました。" + roomList[data2name] + "人います。" );
+
+      socket.set('room', data2name);
+      socket.join(data2name);
+
+      io.sockets.to(data2name).emit('message', data2name + "に入室しました");
+
+      io.sockets.emit("roomList", roomList);
+
+    }else if(roomList[data2name]){
+      if(roomList[data2name] >= 1 && roomList[data2name] < 4){
+        //ルームが作られていて、人数が1～3人の場合
+        roomList[data2name]++;
+
+        console.log(data2name+ "番ルームに入室しました。現在" + roomList[data2name] + "人");
+
+        socket.set('room', data2name);
+        socket.join(data2name);
+
+        io.sockets.to(data2name).emit('message', data2name + "に入室しました");
+
+        upDateRL(roomList);
+
+      }else{
+        console.log(data2name+ "番ルームは満員です。");
+        //ルームが作られていて人数が満員の時
+      }
+    }
+  });
+
+  socket.on("disconnect", function () {
+    //console.log("ウェブサイトから退室：現在" + count + "人");
+    //io.sockets.emit("port", {value: count});
+  });
+
+  socket.on('chat message', function(room, msg){
+    socket.join(room);
+    console.log('room:' + room + ':msg:' + msg);
+    io.in(room).emit('chat message', msg);
   });
 });
 
