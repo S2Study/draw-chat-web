@@ -44,7 +44,6 @@ roomList[defaultRoom] = 0;
 
 io.on('connection', function(socket){
 
-
   socket.on('init', function(room){
     socket.join(defaultRoom);
     io.sockets.emit("room in", {name: defaultRoom});
