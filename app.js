@@ -45,7 +45,12 @@ app.use('/users', require('./app/controllers/users.controller'));
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
-  next(err);
+  // next(err);
+  res.render('error', {
+    title: "404 page not found",
+    message: err.message,
+    error: err
+  });
 });
 
 // error handlers
@@ -67,6 +72,7 @@ if (app.get('env') === 'development') {
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
+    title: "500 internal server error",
     message: err.message,
     error: {}
   });
