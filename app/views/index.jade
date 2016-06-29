@@ -1,13 +1,15 @@
 extends layout
 
 block content
-  h1.room-title= title
+  h3.room-title= title
   #port-box
-  form#message_form(action='')
-    input#message(autocomplete='off')
+  i.material-icons face
+  form#message_form(action="")
+    input#name(placeholder="匿名")
+    input#message(placeholder="コメント")
     button Send
   ul#messages
-  script(src='javascripts/index.js')
+  script(src='/javascripts/index.js')
 
 
 

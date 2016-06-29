@@ -4,8 +4,12 @@ html
     title
       | お絵描きチャット |
       = title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    script(src='javascripts/jquery-3.0.0.min.js')
-    script(src='socket.io/socket.io.js')
+    link(rel="stylesheet", type="text/css", href="https://fonts.googleapis.com/icon?family=Material+Icons")
+    link(rel="stylesheet", type="text/css", href="/stylesheets/material.min.css")
+    link(rel="stylesheet", type="text/css", href="/css/style.css")
+
+    script(src="/javascripts/jquery-3.0.0.min.js")
+    script(src="/javascripts/material.min.js")
+    script(src="socket.io/socket.io.js")
   body
     block content
