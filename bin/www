@@ -3,32 +3,34 @@
 /**
  * Module dependencies.
  */
-
-var app = require('../app');
 var debug = require('debug')('draw-chat-web:server');
+var app = require('../app');
 var http = require('http');
+var models = require("../app/models");
 
 /**
  * Get port from environment and store in Express.
  */
-
 var port = normalizePort(process.env.PORT || 3000);
 app.set('port', port);
+
 
 /**
  * Create HTTP server.
  */
 var server = http.createServer(app);
 
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-//サーバーを立ち上げたら実行
-server.listen(app.get('port'), function() {
-  console.log('listening!!! *:' + app.get('port'));
+models.sequelize.sync().then(function() {
+  /**
+   * Listen on provided port, on all network interfaces.
+   */
+  //サーバーを立ち上げたら実行
+  server.listen(app.get('port'), function() {
+    console.log('listening!!! *:' + app.get('port'));
+  });
 });
-// server.listen(port);
+
+
 server.on('error', onError);
 server.on('listening', onListening);
 
@@ -39,76 +41,49 @@ var io = require('socket.io')(server);
 
 //socket処理を記載する
 var roomList = new Object();
-var defaultRoom = "みんなの広場";
-roomList[defaultRoom] = 0;
+var memberList = new Object();
+
 
 io.on('connection', function(socket){
 
-  socket.on('init', function(room){
-    socket.join(defaultRoom);
-    io.sockets.emit("room in", {name: defaultRoom});
-
-    var member = roomList[defaultRoom];
-    roomList[defaultRoom] = member+1;
-    console.log("#########");
-    console.log(socket.rooms);
-    console.log(roomList);
-    console.log(roomList[defaultRoom]);
-    console.log("#########");
-    io.sockets.emit("port", {value: roomList[defaultRoom]});
-  });
-
-  socket.on('join room', function(room){
-    console.log('join room: ' + room);
+  socket.on('init', function(room, name){
+    console.log("init ########## " + socket.id);
     socket.join(room);
-  });
+    memberList[socket.id] = room;
+    var names = name || "匿名";
+    io.in(room).emit("room in", {name: names});
 
-  socket.on("enter", function(data2){
-    var data2name = htmlspecialchars(data2.value);
-    //ルーム作成orルーム入室イベントが起きる。XSSを回避
-    if(!roomList[data2name]){
-      //ルームが作られていない場合
-
-      roomList[data2name] = 1;
-      console.log(data2name + "番ルームが作られました。" + roomList[data2name] + "人います。" );
-
-      socket.set('room', data2name);
-      socket.join(data2name);
-
-      io.sockets.to(data2name).emit('message', data2name + "に入室しました");
-
-      io.sockets.emit("roomList", roomList);
-
-    }else if(roomList[data2name]){
-      if(roomList[data2name] >= 1 && roomList[data2name] < 4){
-        //ルームが作られていて、人数が1～3人の場合
-        roomList[data2name]++;
-
-        console.log(data2name+ "番ルームに入室しました。現在" + roomList[data2name] + "人");
-
-        socket.set('room', data2name);
-        socket.join(data2name);
-
-        io.sockets.to(data2name).emit('message', data2name + "に入室しました");
-
-        upDateRL(roomList);
-
-      }else{
-        console.log(data2name+ "番ルームは満員です。");
-        //ルームが作られていて人数が満員の時
-      }
-    }
+    console.log(socket.adapter.rooms[room].length);
+    io.in(room).emit("room member", {value: socket.adapter.rooms[room].length});
   });
 
   socket.on("disconnect", function () {
-    //console.log("ウェブサイトから退室：現在" + count + "人");
-    //io.sockets.emit("port", {value: count});
+    console.log("disconnect ########## " + socket.id);
+    var room = memberList[socket.id];
+    if(room && socket.adapter.rooms[room]){
+      io.in(room).emit("room member", {value: socket.adapter.rooms[room].length});
+      delete memberList[socket.id];
+    }
   });
 
-  socket.on('chat message', function(room, msg){
-    socket.join(room);
-    console.log('room:' + room + ':msg:' + msg);
-    io.in(room).emit('chat message', msg);
+  socket.on('chat message', function(res){
+    var room = memberList[socket.id];
+    var names = res.name || "匿名";
+    var user_id = socket.id;
+    var message = res.message;
+
+    models.Groups
+      .findOrCreate({where: {group_name: room}})
+      .spread(function(group, created) {
+        models.Messages.create({
+          group_id: group.id,
+          user_id: user_id,
+          user_name: names,
+          message: message
+        }).then(function() {});
+      });
+    console.log('room[' + room + ']name[' + names + ']msg[' + message + "]");
+    io.in(room).emit('chat message', res.message);
   });
 });
 

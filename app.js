@@ -5,10 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 // xss-filtersも読み込んでおく
-var xssFilters = require('xss-filters');
-
-var routes = require('./app/controllers/index.controller');
-var users = require('./app/controllers/users.controller');
+// var xssFilters = require('xss-filters');
 
 var app = express();
 
@@ -30,9 +27,8 @@ app.use(require('node-sass-middleware')({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
-
+app.use('/', require('./app/controllers/index.controller'));
+app.use('/users', require('./app/controllers/users.controller'));
 
 
 
@@ -76,4 +72,7 @@ app.use(function(err, req, res, next) {
   });
 });
 
+
+
 module.exports = app;
+
