@@ -1,53 +1,13 @@
 extends layout
 
 block content
-  h1= title
-  #roomList
+  h1.room-title= title
   #port-box
-  form#room_form(action='')
-    input#room(autocomplete='off')
+  form#message_form(action='')
+    input#message(autocomplete='off')
     button Send
   ul#messages
-  form#message_form(action='')
-    input#m(autocomplete='off')
-    button Send
-  script(src='/socket.io/socket.io.js')
-  script(src='javascripts/jquery-3.0.0.min.js')
-  script.
-    var socket = io();
-    socket.emit('init', $("h1").text());
-
-
-    $('#message_form').submit(function () {
-      socket.emit('chat message', {name: "", message: $('#m').val()});
-      $('#m').val('');
-      // console.log(sockets.manager.rooms);
-      return false;
-    });
-
-    socket.on("roomList", function(roomList){
-      $("#roomList").text("");
-      if(roomList){
-        for(var j in roomList){
-          console.log(j + "、" + roomList[j] + "人います");
-          var roomLcount = roomList[j];
-          var roomName = j;
-          $("#roomList").append("<span>" + roomName + "</span>");
-        }
-      }
-    });
-
-    socket.on("room in", function(res){
-      $('#messages').append($('<li>').text(res.name + "さんが入室しました"));
-    });
-    socket.on("room member", function(res){
-      $("#port-box").text(res.value + "人がオンライン");
-    });
-
-    socket.on('chat message', function (msg) {
-      console.log(msg + "  ##########");
-      $('#messages').append($('<li>').text(msg));
-    });
+  script(src='javascripts/index.js')
 
 
 
