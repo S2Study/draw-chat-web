@@ -58,5 +58,5 @@ socket.on("chat message", function (res) {
   if(res.image_path){
     base.append($("<img src='/upload/"+res.image_path+"'>"));
   }
-  $("#messages").append(base);
+  $("#messages").prepend(base);
 });
