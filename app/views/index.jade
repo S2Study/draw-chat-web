@@ -3,11 +3,16 @@ extends layout
 block content
   h3.room-title= title
   #port-box
+  input#move_room(placeholder="移動する部屋")
   i.material-icons face
   form#message_form(action="")
     input#name(placeholder="匿名")
     input#message(placeholder="コメント")
-    button Send
+    button.mdl-button.mdl-js-button.mdl-button--fa.mdl-button--colored
+      i.material-icons near_me
+  form#image_form(action="")
+    button.mdl-button.mdl-js-button.mdl-button--fa.mdl-button--colored
+      i.material-icons image
   ul#messages
   script(src='/javascripts/index.js')
 

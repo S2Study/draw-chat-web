@@ -53,7 +53,9 @@ io.on('connection', function(socket){
     var names = name || "匿名";
     io.in(room).emit("room in", {name: names});
 
-    console.log(socket.adapter.rooms[room].length);
+    //console.log(memberList);
+    //console.log(memberList[socket.id]);
+    //console.log(socket.adapter.rooms[room].length);
     io.in(room).emit("room member", {value: socket.adapter.rooms[room].length});
   });
 
@@ -80,10 +82,17 @@ io.on('connection', function(socket){
           user_id: user_id,
           user_name: names,
           message: message
-        }).then(function() {});
+        }).then(function(messageRecord) {
+          console.log('room[' + room + ']name[' + messageRecord.user_name + ']msg[' + messageRecord.message + "]");
+          resMsg = {
+            user_id: messageRecord.user_id
+            , user_name: messageRecord.user_name
+            , msg: messageRecord.message
+            , stamp: messageRecord.createdAt
+          };
+          io.in(room).emit('chat message', resMsg);
+        });
       });
-    console.log('room[' + room + ']name[' + names + ']msg[' + message + "]");
-    io.in(room).emit('chat message', res.message);
   });
 });
 

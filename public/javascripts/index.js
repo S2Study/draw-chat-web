@@ -1,8 +1,13 @@
 var socket = io();
-socket.emit("init", $("h1").text());
+socket.emit("init", $(".room-title").text());
 
 $("#message_form").submit(function () {
-  socket.emit("chat message", {name: "", message: $("#message").val()});
+  var sendMessage = $("#message").val();
+  var sendName = $("#name").val();
+  if(!sendMessage){
+    return false;
+  }
+  socket.emit("chat message", {name: sendName, message: sendMessage});
   $("#message").val("");
   return false;
 });
@@ -15,6 +20,6 @@ socket.on("room member", function(res){
   $("#port-box").text("オンライン: " + res.value + "人");
 });
 
-socket.on("chat message", function (msg) {
-  $("#messages").append($("<li>").text(msg));
+socket.on("chat message", function (res) {
+  $("#messages").append($("<li>").text(res.stamp + " / " + res.user_id + " / " + res.user_name + " / " + res.msg));
 });
