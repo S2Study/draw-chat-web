@@ -1,6 +1,15 @@
 var socket = io();
 socket.emit("init", $(".room-title").text());
 
+$("#move_form").submit(function () {
+  var room = $("#move_room").val();
+  if(!room){
+    return false;
+  }
+  location.href = "/" + room;
+  return false;
+});
+
 $("#message_form").submit(function () {
   var sendMessage = $("#message").val();
   var sendName = $("#name").val();
