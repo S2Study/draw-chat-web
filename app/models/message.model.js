@@ -7,6 +7,7 @@ module.exports = function (sequelize, DataTypes) {
     ,user_name: DataTypes.STRING
     ,message: DataTypes.STRING
     ,image_path: DataTypes.STRING
+    ,deleted: DataTypes.BOOLEAN
   }, {
     classMethods: {
       associate: function (models) {

@@ -23,7 +23,8 @@ block content
   ul#messages
     each message in messages
       li
-        p= message.createdAt + " / " + message.user_id + " / " + message.user_name + " / " + (message.message || "")
+        p= message.id + " / " + message.createdAt + " / " + message.user_id + " / " + message.user_name + " / " + (message.message || "")
+        span= message.deleted
         if message.image_path
           img(src="/upload/"+message.image_path)
   script(src='/javascripts/index.js')

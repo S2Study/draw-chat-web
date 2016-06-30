@@ -54,7 +54,7 @@ socket.on("room member", function(res){
 
 socket.on("chat message", function (res) {
   var base = $("<li>");
-  base.append($("<p>").text(res.stamp + " / " + res.user_id + " / " + res.user_name + " / " + (res.message || "")));
+  base.append($("<p>").text(res.id + " / " + res.stamp + " / " + res.user_id + " / " + res.user_name + " / " + (res.message || "")));
   if(res.image_path){
     base.append($("<img src='/upload/"+res.image_path+"'>"));
   }

@@ -136,10 +136,12 @@ function saveMessage(saveData){
       }).then(function(messageRecord) {
         console.log('room[' + saveData.room + ']name[' + messageRecord.user_name + ']msg[' + messageRecord.message + "]img[" + messageRecord.image_path + "]");
         resMsg = {
-          user_id: messageRecord.user_id
+          id: messageRecord.id
+          ,user_id: messageRecord.user_id
           ,user_name: messageRecord.user_name
           ,message: messageRecord.message
           ,image_path: messageRecord.image_path
+          ,deleted: messageRecord.deleted
           ,stamp: messageRecord.createdAt
         };
         io.in(saveData.room).emit('chat message', resMsg);

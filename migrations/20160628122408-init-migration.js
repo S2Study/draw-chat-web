@@ -71,6 +71,11 @@ module.exports = {
         ,image_path: {
           type: Sequelize.STRING
         }
+        ,deleted: {
+          type: Sequelize.BOOLEAN
+          ,allowNull: false
+          ,defaultValue: false
+        }
       }
     );
     return result;
