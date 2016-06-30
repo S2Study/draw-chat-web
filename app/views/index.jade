@@ -1,15 +1,8 @@
 extends layout
 
 block content
-  .mdl-grid
-    h3.room-title.mdl-cell--middle.mdl-cell--10-col= title
-    #port-box.mdl-cell--middle.mdl-cell--2-col
-
-  form#message_form.mdl-grid(action="")
-    input#name.mdl-cell.mdl-cell--3-col(placeholder="匿名")
-    input#message.mdl-cell.mdl-cell--8-col(placeholder="コメント")
-    button.mdl-cell.mdl-cell--1-col.mdl-button.mdl-js-button.mdl-button--fa.mdl-button--colored
-      i.material-icons near_me
+  h3.room-title= title
+  #port-box
 
   .mdl-grid
     form#move_form.mdl-cell.mdl-cell--3-col(action="")
@@ -19,6 +12,13 @@ block content
     form#image_form.mdl-cell.mdl-cell--1-col(action="")
       button.mdl-button.mdl-js-button.mdl-button--fa.mdl-button--colored
         i.material-icons image
+
+  form#message_form.mdl-grid(action="")
+    input#name.mdl-cell.mdl-cell--3-col(placeholder="匿名")
+    input#message.mdl-cell.mdl-cell--8-col(placeholder="コメント")
+    button.mdl-cell.mdl-cell--1-col.mdl-button.mdl-js-button.mdl-button--fa.mdl-button--colored
+      i.material-icons near_me
+
   ul#messages
   script(src='/javascripts/index.js')
 
