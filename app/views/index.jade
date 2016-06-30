@@ -9,7 +9,8 @@ block content
       input#move_room(placeholder="部屋移動")
       button.mdl-button.mdl-js-button.mdl-button--fa.mdl-button--colored
         i.material-icons directions_run
-    form#image_form.mdl-cell.mdl-cell--1-col(action="")
+    form#image_form.mdl-cell.mdl-cell--5-col(action="")
+      input#input_image(type="file", name="images")
       button.mdl-button.mdl-js-button.mdl-button--fa.mdl-button--colored
         i.material-icons image
 
@@ -20,6 +21,11 @@ block content
       i.material-icons near_me
 
   ul#messages
+    each message in messages
+      li
+        p= message.createdAt + " / " + message.user_id + " / " + message.user_name + " / " + (message.message || "")
+        if message.image_path
+          img(src="/upload/"+message.image_path)
   script(src='/javascripts/index.js')
 
 

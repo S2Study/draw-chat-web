@@ -7,6 +7,7 @@ var debug = require('debug')('draw-chat-web:server');
 var app = require('../app');
 var http = require('http');
 var models = require("../app/models");
+var fs = require('fs');
 
 /**
  * Get port from environment and store in Express.
@@ -70,32 +71,81 @@ io.on('connection', function(socket){
 
   socket.on('chat message', function(res){
     var room = memberList[socket.id];
-    var names = res.name || "匿名";
     var user_id = socket.id;
+    var names = res.name || "匿名";
     var message = res.message;
 
-    models.Groups
-      .findOrCreate({where: {group_name: room}})
-      .spread(function(group, created) {
-        models.Messages.create({
-          group_id: group.id,
-          user_id: user_id,
-          user_name: names,
-          message: message
-        }).then(function(messageRecord) {
-          console.log('room[' + room + ']name[' + messageRecord.user_name + ']msg[' + messageRecord.message + "]");
-          resMsg = {
-            user_id: messageRecord.user_id
-            , user_name: messageRecord.user_name
-            , msg: messageRecord.message
-            , stamp: messageRecord.createdAt
-          };
-          io.in(room).emit('chat message', resMsg);
-        });
-      });
+    saveMessage({
+      room: room
+      ,userId: user_id
+      ,userName: names
+      ,message: message
+      ,fileNames: null
+    });
+  });
+
+  socket.on('upload', function (data) {
+    var room = memberList[socket.id];
+    var userName = data.userName || "匿名";
+    var userId = socket.id;
+
+    var name = data.fileName || anonymous;
+    var img = data.fileData;
+
+    var imgStructure = img.split(',');
+    var base64 = imgStructure[1];
+
+    if (!base64) {
+        console.log('fal to parse image');
+    }
+
+    var now = new Date().getTime();
+    var fileNames = now + name;
+    var outputPath = './public/upload/' + fileNames;
+    var publicUrl = '/upload/' + fileNames;
+
+    // データ保存
+    fs.writeFile(
+        outputPath,
+        new Buffer(base64, 'base64'),
+        function (err) {
+            console.log(err);
+        }
+    );
+    // DB保存
+    saveMessage({
+      room: room
+      ,userId: userId
+      ,userName: userName
+      ,message: null
+      ,fileNames: fileNames
+    });
   });
 });
 
+function saveMessage(saveData){
+  models.Groups
+    .findOrCreate({where: {group_name: saveData.room}})
+    .spread(function(group, created) {
+      models.Messages.create({
+        group_id: group.id
+        ,user_id: saveData.userId
+        ,user_name: saveData.userName
+        ,message: saveData.message
+        ,image_path: saveData.fileNames
+      }).then(function(messageRecord) {
+        console.log('room[' + saveData.room + ']name[' + messageRecord.user_name + ']msg[' + messageRecord.message + "]img[" + messageRecord.image_path + "]");
+        resMsg = {
+          user_id: messageRecord.user_id
+          ,user_name: messageRecord.user_name
+          ,message: messageRecord.message
+          ,image_path: messageRecord.image_path
+          ,stamp: messageRecord.createdAt
+        };
+        io.in(saveData.room).emit('chat message', resMsg);
+      });
+    });
+}
 
 
 /**

@@ -67,7 +67,9 @@ module.exports = {
         }
         ,message: {
           type: Sequelize.STRING
-          ,allowNull: false
+        }
+        ,image_path: {
+          type: Sequelize.STRING
         }
       }
     );

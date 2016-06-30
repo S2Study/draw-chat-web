@@ -6,7 +6,9 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function(models) {
-        Groups.hasMany(models.Messages)
+        Groups.hasMany(models.Messages,{
+          foreignKey: 'group_id'
+        })
       }
     }
   });

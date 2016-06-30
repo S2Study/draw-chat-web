@@ -26,8 +26,15 @@ router.get('/', function(req, res, next) {
       // group.update({
       //   group_count: group.group_count+1
       // }).then(function() {});
+      models.Messages
+        .findAll({
+          where: {group_id: group.id}
+          ,order: [ ['createdAt', 'DESC'] ]
+        })
+        .then(function(messages) {
+          res.render('index', { title: defaultRoom, messages: messages });
+        });
     });
-  res.render('index', { title: defaultRoom });
 });
 
 router.get('/:group_name', function(req, res, next) {
